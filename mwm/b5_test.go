@@ -2,8 +2,11 @@ package mwm
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
+	"math/rand/v2"
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestInitialize(t *testing.T) {
@@ -38,4 +41,27 @@ func TestSolve2(t *testing.T) {
 	b.AddEdge(2, 3, 10)
 	b.AddEdge(3, 4, 1)
 	fmt.Println(b.Solve())
+}
+
+const p = 0.17
+
+func BenchmarkB5(b *testing.B) {
+	n := b.N
+	b5 := New(n)
+	pp := p
+	if n < 100 {
+		pp = 1
+	}
+	for i := 1; i <= n; i++ {
+		for j := i + 1; j <= n; j++ {
+			if rand.Float64() < pp {
+				w := rand.N(300) + 1
+				b5.AddEdge(i, j, w)
+			}
+		}
+	}
+	b.ResetTimer()
+	s := time.Now()
+	b5.Solve()
+	fmt.Printf("bench %d: %v\n", n, time.Since(s))
 }
